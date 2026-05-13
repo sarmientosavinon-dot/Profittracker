@@ -52,8 +52,8 @@
 
     <div class="flex justify-between items-center mb-8">
       <div>
-        <h1 class="text-5xl font-black gold">💨 VAPE EMPIRE</h1>
-        <p class="text-yellow-200">Dashboard premium de inventario y profit</p>
+        <h1 class="text-5xl font-black gold">💨 DarioVapos</h1>
+        <p class="text-yellow-200">Sistema premium de inventario y profit</p>
       </div>
 
       <button onclick="resetData()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl font-bold">
@@ -284,43 +284,54 @@
 
     function sellProduct(id) {
 
-      const product = products.find(p => p.id === id);
+      const productIndex = products.findIndex(p => p.id === id);
 
-      if (!product) {
+      if (productIndex === -1) {
         alert('Producto no encontrado');
         return;
       }
 
+      const product = products[productIndex];
+
       if (product.stock <= 0) {
-        alert('No hay stock');
+        alert('No hay stock disponible');
         return;
       }
 
       const customer = prompt('¿A quién se le vendió?');
 
       if (!customer || customer.trim() === '') {
+        alert('Debes escribir un nombre');
         return;
       }
 
-      product.stock -= 1;
-      product.sold += 1;
+      products[productIndex].stock = Number(products[productIndex].stock) - 1;
+      products[productIndex].sold = Number(products[productIndex].sold) + 1;
 
-      const newSale = {
+      const sale = {
+        id: Date.now(),
         product: product.name,
         flavor: product.flavor,
-        customer: customer,
+        customer: customer.trim(),
         date: new Date().toLocaleString('es-MX')
       };
 
-      sales.unshift(newSale);
+      sales.unshift(sale);
 
-      localStorage.setItem('vapeSales', JSON.stringify(sales));
-      localStorage.setItem('vapeProducts', JSON.stringify(products));
+      saveData();
 
       renderProducts();
       renderSales();
 
-      console.log('Venta registrada:', newSale);
+      const button = event.target;
+
+      if (button) {
+        button.innerText = '✅ Vendido';
+
+        setTimeout(() => {
+          button.innerText = 'Vender';
+        }, 1200);
+      }
     }
 
     function restockProduct(id) {
