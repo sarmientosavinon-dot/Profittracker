@@ -216,8 +216,6 @@
 
     function renderProducts() {
 
-      const existingHistory = document.getElementById('salesHistory')?.innerHTML || '';
-
       const grid = document.getElementById('productsGrid');
 
       grid.innerHTML = '';
@@ -262,7 +260,7 @@
 
           <div class="flex gap-3">
 
-            <button onclick="sellProduct(${product.id})"
+            <button onclick="sellProduct(${product.id}, event)"
               class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-xl flex-1 font-bold">
               Vender
             </button>
@@ -282,15 +280,9 @@
       document.getElementById('investedTotal').innerText = money(totalInvested);
       document.getElementById('capitalTotal').innerText = money(totalInvested + totalProfit);
       document.getElementById('productCount').innerText = products.length;
-
-      const historyContainer = document.getElementById('salesHistory');
-
-      if (historyContainer && existingHistory.trim() !== '') {
-        historyContainer.innerHTML = existingHistory;
-      }
     }
 
-    function sellProduct(id) {
+    function sellProduct(id, event) {
 
       const productIndex = products.findIndex(p => p.id === id);
 
@@ -335,10 +327,7 @@
       }
 
       renderProducts();
-
-      setTimeout(() => {
-        renderSales();
-      }, 10);
+      renderSales();
 
       const button = event.target;
 
