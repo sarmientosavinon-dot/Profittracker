@@ -216,6 +216,8 @@
 
     function renderProducts() {
 
+      const existingHistory = document.getElementById('salesHistory')?.innerHTML || '';
+
       const grid = document.getElementById('productsGrid');
 
       grid.innerHTML = '';
@@ -280,6 +282,12 @@
       document.getElementById('investedTotal').innerText = money(totalInvested);
       document.getElementById('capitalTotal').innerText = money(totalInvested + totalProfit);
       document.getElementById('productCount').innerText = products.length;
+
+      const historyContainer = document.getElementById('salesHistory');
+
+      if (historyContainer && existingHistory.trim() !== '') {
+        historyContainer.innerHTML = existingHistory;
+      }
     }
 
     function sellProduct(id) {
@@ -326,8 +334,11 @@
         salesContainer.innerHTML = '';
       }
 
-      renderSales();
       renderProducts();
+
+      setTimeout(() => {
+        renderSales();
+      }, 10);
 
       const button = event.target;
 
