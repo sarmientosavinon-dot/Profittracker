@@ -7,15 +7,42 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      background: #0a0a0a;
+      background: linear-gradient(135deg, #050505, #111111);
       color: white;
       font-family: Arial, sans-serif;
+      overflow-x: hidden;
     }
 
     .glass {
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255, 215, 0, 0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 215, 0, 0.15);
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.08);
+      transition: 0.3s ease;
+    }
+
+    .glass:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+    }
+
+    .gold {
+      color: #FFD700;
+    }
+
+    .fade-in {
+      animation: fade 0.4s ease;
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0px);
+      }
     }
   </style>
 </head>
@@ -25,8 +52,8 @@
 
     <div class="flex justify-between items-center mb-8">
       <div>
-        <h1 class="text-4xl font-bold">💨 Vape Profit Dashboard</h1>
-        <p class="text-gray-400">Control de inventario y ganancias</p>
+        <h1 class="text-5xl font-black gold">💨 VAPE EMPIRE</h1>
+        <p class="text-yellow-200">Dashboard premium de inventario y profit</p>
       </div>
 
       <button onclick="resetData()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl font-bold">
@@ -93,6 +120,12 @@
       <h2 class="text-2xl font-bold mb-4">📦 Inventario</h2>
 
       <div id="productsGrid" class="grid md:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+
+      <div class="glass rounded-3xl p-6 mt-10 fade-in">
+        <h2 class="text-2xl font-bold gold mb-5">🛒 Historial de Ventas</h2>
+
+        <div id="salesHistory" class="space-y-3 text-sm"></div>
+      </div>
     </div>
 
   </div>
@@ -100,9 +133,11 @@
   <script>
 
     let products = JSON.parse(localStorage.getItem('vapeProducts')) || [];
+    let sales = JSON.parse(localStorage.getItem('vapeSales')) || [];
 
     function saveData() {
       localStorage.setItem('vapeProducts', JSON.stringify(products));
+      localStorage.setItem('vapeSales', JSON.stringify(sales));
     }
 
     function money(value) {
@@ -135,7 +170,36 @@
       products.push(product);
 
       saveData();
-      renderProducts();
+      function renderSales() {
+
+      const container = document.getElementById('salesHistory');
+
+      container.innerHTML = '';
+
+      if (sales.length === 0) {
+        container.innerHTML = '<p class="text-gray-400">No hay ventas todavía</p>';
+        return;
+      }
+
+      sales.forEach(sale => {
+
+        const item = document.createElement('div');
+
+        item.className = 'bg-black/40 border border-yellow-500/10 rounded-2xl p-4 fade-in';
+
+        item.innerHTML = `
+          <p class="font-bold gold">${sale.product}</p>
+          <p>${sale.flavor}</p>
+          <p class="text-green-400">Cliente: ${sale.customer}</p>
+          <p class="text-gray-400 text-xs">${sale.date}</p>
+        `;
+
+        container.appendChild(item);
+      });
+    }
+
+    renderProducts();
+    renderSales();
 
       document.getElementById('name').value = '';
       document.getElementById('flavor').value = '';
@@ -164,7 +228,7 @@
 
         const card = document.createElement('div');
 
-        card.className = 'glass rounded-3xl p-5';
+        card.className = 'glass rounded-3xl p-5 fade-in';
 
         card.innerHTML = `
           <div class="flex justify-between items-start mb-4">
@@ -221,11 +285,23 @@
         return;
       }
 
+      const customer = prompt('¿A quién se le vendió?');
+
+      if (!customer) return;
+
       product.stock--;
       product.sold++;
 
+      sales.unshift({
+        product: product.name,
+        flavor: product.flavor,
+        customer,
+        date: new Date().toLocaleString('es-MX')
+      });
+
       saveData();
       renderProducts();
+      renderSales();
     }
 
     function restockProduct(id) {
@@ -272,9 +348,13 @@
       if (!confirm('Esto borrará TODO')) return;
 
       localStorage.removeItem('vapeProducts');
+      localStorage.removeItem('vapeSales');
+
       products = [];
+      sales = [];
 
       renderProducts();
+      renderSales();
     }
 
     renderProducts();
