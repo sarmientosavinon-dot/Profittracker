@@ -320,8 +320,14 @@
 
       saveData();
 
-      renderProducts();
+      const salesContainer = document.getElementById('salesHistory');
+
+      if (salesContainer) {
+        salesContainer.innerHTML = '';
+      }
+
       renderSales();
+      renderProducts();
 
       const button = event.target;
 
