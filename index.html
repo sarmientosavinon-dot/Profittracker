@@ -286,6 +286,11 @@
 
       const product = products.find(p => p.id === id);
 
+      if (!product) {
+        alert('Producto no encontrado');
+        return;
+      }
+
       if (product.stock <= 0) {
         alert('No hay stock');
         return;
@@ -293,21 +298,29 @@
 
       const customer = prompt('¿A quién se le vendió?');
 
-      if (!customer) return;
+      if (!customer || customer.trim() === '') {
+        return;
+      }
 
-      product.stock--;
-      product.sold++;
+      product.stock -= 1;
+      product.sold += 1;
 
-      sales.unshift({
+      const newSale = {
         product: product.name,
         flavor: product.flavor,
-        customer,
+        customer: customer,
         date: new Date().toLocaleString('es-MX')
-      });
+      };
 
-      saveData();
+      sales.unshift(newSale);
+
+      localStorage.setItem('vapeSales', JSON.stringify(sales));
+      localStorage.setItem('vapeProducts', JSON.stringify(products));
+
       renderProducts();
       renderSales();
+
+      console.log('Venta registrada:', newSale);
     }
 
     function restockProduct(id) {
